@@ -1,0 +1,7 @@
+{
+    "port": 41110,
+    "dbHost": "127.0.0.1",
+    "dbName": "todo",
+    "dbUser": "todo",
+    "dbPassword": "SFtYKBE9dYaK"
+}
