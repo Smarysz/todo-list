@@ -1,16 +1,32 @@
 const express = require('express');
 const { exec } = require('child_process');
 const fs = require('fs');
-const ejs = require('ejs');
 
-const todo = require('./lib/todo');
+const TODO = require('./lib/todo');
+const TODODB = require('./lib/tododb');
 
-fs.readFile('config.json', function (err, data) {
-    if (err) {
-        todo.err(err);
-    } else {
+(async function () {
 
-        const config = JSON.parse(data.toString());
+    try {
+
+        const config = JSON.parse(await fs.promises.readFile('config.json', { encoding: "utf8" }));
+
+        const db = new TODODB({
+            dbHost: config.dbHost,
+            dbUser: config.dbUser,
+            dbPassword: config.dbPassword,
+            dbName: config.dbName,
+            dbPort: config.dbPort,
+            dbTimeout: config.dbTimeout
+        });
+
+        const isCorrect = await db.testConnection();
+
+        if (!isCorrect) {
+            TODO.error('Database error!');
+            return;
+        }
+
         const app = express();
 
         app.set('view engine', 'ejs');
@@ -19,20 +35,29 @@ fs.readFile('config.json', function (err, data) {
         app.use(express.static('./static'));
 
         app.get('/', function (req, res) {
-            res.render('index', {});
+            res.render('index');
         });
 
-        const server = app.listen(config.port, function () {
+        app.use(function (req, res) {
+            res.status(404);
+            res.render('404');
+        });
 
-            const appURL = 'http://127.0.0.1:' + config.port + '/';
+        app.listen(config.appPort, '127.0.0.1', function () {
 
-            todo.info('Application runs on ' + appURL);
+            const appURL = 'http://127.0.0.1:' + config.appPort + '/';
 
-            exec('start http://127.0.0.1:' + config.port, function (error, stdout, stderr) {
+            TODO.success('Application runs on ' + appURL);
+
+            exec('start http://127.0.0.1:' + config.appPort, function (error) {
                 if (error) {
-                    todo.error('Can not open application in browser! Paste this url in address bar: ' + appURL);
+                    TODO.error('Can not open application in browser! Paste this url in address bar: ' + appURL);
                 }
             });
         });
+
+    } catch (err) {
+        TODO.error(err);
     }
-});
+
+})();

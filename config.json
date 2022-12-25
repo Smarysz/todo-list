@@ -1,7 +1,9 @@
 {
-    "port": 41110,
+    "appPort": 41114,
     "dbHost": "127.0.0.1",
     "dbName": "todo",
     "dbUser": "todo",
-    "dbPassword": "SFtYKBE9dYaK"
+    "dbPassword": "SFtYKBE9dYaK",
+    "dbPort": 3306,
+    "dbTimeout": 5000
 }
