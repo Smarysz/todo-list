@@ -20,9 +20,7 @@ const TODODB = require('./lib/tododb');
             dbTimeout: config.dbTimeout
         });
 
-        const isCorrect = await db.testConnection();
-
-        if (!isCorrect) {
+        if (!await db.testConnection()) {
             TODO.error('Database error!');
             return;
         }
@@ -34,8 +32,26 @@ const TODODB = require('./lib/tododb');
 
         app.use(express.static('./static'));
 
+        // Own render function which render a view with model containing page ID
+        app.use(function (req, res, next) {
+            res.renderID = function (view, model = {}) {
+                view = String(view);
+                model.pageID = view;
+                return this.render(view, model);
+            };
+            next();
+        });
+
         app.get('/', function (req, res) {
-            res.render('index');
+            res.renderID('index');
+        });
+
+        app.get('/tasks', function (req, res) {
+            res.renderID('tasks');
+        });
+
+        app.get('/notes', function (req, res) {
+            res.renderID('notes');
         });
 
         app.use(function (req, res) {

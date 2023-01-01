@@ -9,8 +9,12 @@
     <link rel="stylesheet" href="css/global.css">
 </head>
 
-<body>
-    <h1>Test</h1>
+<body class="id-<%= locals.pageID || 'none' %>" data-pageid="<%= locals.pageID %>">
+    <%- include('header') %>
+    <div class="main-container">
+        STRONGA GŁÓWNA
+    </div>
+    <%- include('footer') %>
     <script src="js/global.js"></script>
 </body>
 
