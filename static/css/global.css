@@ -36,13 +36,16 @@ body {
     font-size: 1.4rem;
     text-decoration: none;
     color: var(--black);
+    height: 100%;
+    display: flex;
+    align-items: center;
 }
 
 .menu-item {
     height: 100%;
     display: flex;
     align-items: center;
-    padding: 0 0.5rem;
+    padding: 0 0.7rem;
     cursor: pointer;
     border-bottom: 3px solid rgba(0, 0, 0, 0);
     box-sizing: border-box;
@@ -71,7 +74,7 @@ body {
 .id-404 .main-container {
     height: 100vh;
     width: 100vw;
-    position: absolute;
+    position: fixed;
     top: 0;
     display: flex;
     align-items: center;
@@ -89,4 +92,32 @@ body {
 .copyright-title {
     font-size: 1.2rem;
     font-weight: bold;
+}
+
+.exit-title {
+    width: 64px;
+}
+
+.exit-title img {
+    height: 52%;
+}
+
+.center {
+    text-align: center;
+}
+
+.mb-1 {
+    margin-bottom: 0.5rem;
+}
+
+.mb-2 {
+    margin-bottom: 1rem;
+}
+
+.mb-3 {
+    margin-bottom: 1.5rem;
+}
+
+.main-container {
+    padding: 1rem;
 }

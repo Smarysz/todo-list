@@ -105,3 +105,4 @@ dist
 
 # Own
 .eslintrc.json
+/static/img

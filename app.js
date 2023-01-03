@@ -33,14 +33,11 @@ const TODODB = require('./lib/tododb');
         app.use(express.static('./static'));
 
         // Own render function which render a view with model containing page ID
-        app.use(function (req, res, next) {
-            res.renderID = function (view, model = {}) {
-                view = String(view);
-                model.pageID = view;
-                return this.render(view, model);
-            };
-            next();
-        });
+        app.response.renderID = function (view, model = {}) {
+            view = String(view);
+            model.pageID = view;
+            return this.render(view, model);
+        };
 
         app.get('/', function (req, res) {
             res.renderID('index');
@@ -52,6 +49,15 @@ const TODODB = require('./lib/tododb');
 
         app.get('/notes', function (req, res) {
             res.renderID('notes');
+        });
+
+        app.get('/exit', function (req, res) {
+            fs.readFile('./static/css/global.css', { encoding: "utf8" }, function(err, data) {
+                res.renderID('exit', { css: data });
+            });
+            setTimeout(() => {
+                process.exit();
+            }, 256);
         });
 
         app.use(function (req, res) {
