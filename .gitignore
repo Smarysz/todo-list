@@ -104,10 +104,4 @@ dist
 .tern-port
 
 # Own
-node.exe
-.eslintrc.json
-/static/img
 .dbeaver
-todo.db-shm
-todo.db-wal
-todo_original.db
