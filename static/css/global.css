@@ -12,13 +12,26 @@ body {
     font-family: Segoe UI;
 }
 
+table {
+    border-collapse: collapse;
+}
+
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 #main-header {
     box-sizing: border-box;
     height: 64px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    background-color: cornflowerblue;
+    background-color: #6495ed;
 }
 
 .app-title {
@@ -29,7 +42,6 @@ body {
     height: 100%;
     display: flex;
     align-items: center;
-    padding: 0 0.5rem;
 }
 
 .menu-item a {
@@ -39,13 +51,15 @@ body {
     height: 100%;
     display: flex;
     align-items: center;
+    padding: 0 0.7rem;
+    width: 100%;
+    justify-content: center;
 }
 
 .menu-item {
     height: 100%;
     display: flex;
     align-items: center;
-    padding: 0 0.7rem;
     cursor: pointer;
     border-bottom: 3px solid rgba(0, 0, 0, 0);
     box-sizing: border-box;
@@ -99,7 +113,7 @@ body {
 }
 
 .exit-title img {
-    height: 52%;
+    height: 48%;
 }
 
 .center {
@@ -118,6 +132,80 @@ body {
     margin-bottom: 1.5rem;
 }
 
+.mb-4 {
+    margin-bottom: 2rem;
+}
+
 .main-container {
     padding: 1rem;
+}
+
+.author-title {
+    width: 116px;
+}
+
+#external_icon {
+    width: 16px;
+    padding: 0.3rem 0 0 0.5rem;
+}
+
+.tasks-table {
+    margin: 2rem auto;
+}
+
+.tasks-table thead tr {
+    cursor: default;
+}
+
+.tasks-table tbody tr:hover {
+    background-color: lightgray;
+}
+
+.tasks-table thead tr {
+    background-color: #6495ed;
+}
+
+.tasks-table td,
+.tasks-table th {
+    border: 1px solid #000;
+    text-align: center;
+    padding: 0.5rem;
+}
+
+.tasks-table th {
+    font-size: 1.2rem;
+}
+
+.remove-task {
+    color: maroon;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.remove-task:hover,
+.confirm-task:hover,
+.edit-task:hover,
+.uncheck-task:hover,
+.priority-task:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.confirm-task {
+    color: #228b22;
+    font-weight: 600;
+}
+
+.edit-task {
+    color: #4169e1;
+    font-weight: 600;
+}
+
+.uncheck-task {
+    color: #be7f0a;
+    font-weight: 600;
+}
+
+.priority-task {
+    font-weight: 600;
 }

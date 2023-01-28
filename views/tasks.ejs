@@ -12,9 +12,61 @@
 <body class="id-<%= locals.pageID || 'none' %>" data-pageid="<%= locals.pageID %>">
     <%- include('header') %>
     <div class="main-container">
-        TASKS
+        <%
+            let utc = dtc = 0;
+            locals.data.forEach(e => {
+                if(!e.done) utc++;
+                else dtc++;
+            });
+        %> 
+        <h1 class="center mb-2">Undone tasks (<%= utc %>)</h1>
+        <%
+            let undoneTasks = `<thead><tr>
+                    <th>Task</th>
+                    <th>Deadline</th>
+                    <th>Priority</th>
+                    <th>Edit</th>
+                    <th>Confirm</th>
+                    <th>Remove</th>
+                </tr></thead>`,
+            doneTasks = `<thead><tr>
+                    <th>Task</th>
+                    <th>Deadline</th>
+                    <th>Priority</th>
+                    <th>Uncheck</th>
+                    <th>Remove</th>
+            </tr></thead>`;
+
+            for(let row of locals.data) {
+                if(!row.done) {
+                    undoneTasks += `<tr class="undone-task">
+                        <td>${row.title}</td>
+                        <td>${row.deadline}</td>
+                        <td><a class="priority-task">${row.priority_name}</a></td>
+                        <td><a data-tid="${row.ID}" class="edit-task">Edit</a></td>
+                        <td><a data-tid="${row.ID}" class="confirm-task">Confirm</a></td>
+                        <td><a data-tid="${row.ID}" class="remove-task">Remove</a></td>
+                    </tr>`;
+                } else {
+                    doneTasks += `<tr class="done-task">
+                        <td>${row.title}</td>
+                        <td>${row.deadline}</td>
+                        <td>${row.priority_name}</td>
+                        <td><a data-tid="${row.ID}" class="uncheck-task">Uncheck</a></td>
+                        <td><a data-tid="${row.ID}" class="remove-task">Remove</a></td>
+                    </tr>`;
+                }
+            }
+
+        %>
+        <table class="tasks-table" title="Double click to copy value">
+            <%- undoneTasks %>
+        </table>
+        <h1 class="center mb-2">Done tasks (<%= dtc %>)</h1>
+        <table class="tasks-table" title="Double click to copy value">
+            <%- doneTasks %>
+        </table>
     </div>
-    <%- include('footer') %>
     <script src="js/global.js"></script>
 </body>
 

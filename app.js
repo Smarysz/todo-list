@@ -1,27 +1,28 @@
 const express = require('express');
 const { exec } = require('child_process');
 const fs = require('fs');
-
 const TODO = require('./lib/todo');
 const TODODB = require('./lib/tododb');
+
+
+/*(async function() {
+
+    console.log(await TODODB.getAllTasks());
+
+})();
+
+return;*/
 
 (async function () {
 
     try {
 
         const config = JSON.parse(await fs.promises.readFile('config.json', { encoding: "utf8" }));
+        config.appPort = config.appPort || 41114;
 
-        const db = new TODODB({
-            dbHost: config.dbHost,
-            dbUser: config.dbUser,
-            dbPassword: config.dbPassword,
-            dbName: config.dbName,
-            dbPort: config.dbPort,
-            dbTimeout: config.dbTimeout
-        });
-
-        if (!await db.testConnection()) {
+        if (!TODODB.testConnection()) {
             TODO.error('Database error!');
+            exec('pause');
             return;
         }
 
@@ -43,8 +44,9 @@ const TODODB = require('./lib/tododb');
             res.renderID('index');
         });
 
-        app.get('/tasks', function (req, res) {
-            res.renderID('tasks');
+        app.get('/tasks', async function (req, res) {
+            const data = await TODODB.getAllTasks();
+            res.renderID('tasks', { data, TODO });
         });
 
         app.get('/notes', function (req, res) {
@@ -52,12 +54,22 @@ const TODODB = require('./lib/tododb');
         });
 
         app.get('/exit', function (req, res) {
-            fs.readFile('./static/css/global.css', { encoding: "utf8" }, function(err, data) {
-                res.renderID('exit', { css: data });
-            });
-            setTimeout(() => {
-                process.exit();
-            }, 256);
+            res.renderID('exit');
+        });
+
+        app.post('/exit', function () {
+            process.exit();
+        });
+
+        app.delete('/task/:id', async function (req, res) {
+            const tid = req.params.id;
+            const removed = await TODODB.removeTask(tid);
+            if (removed) {
+                res.json({ status: true });
+            } else {
+                res.json({ status: false });
+            }
+            res.end();
         });
 
         app.use(function (req, res) {
@@ -71,7 +83,7 @@ const TODODB = require('./lib/tododb');
 
             TODO.success('Application runs on ' + appURL);
 
-            exec('start http://127.0.0.1:' + config.appPort, function (error) {
+            exec('start http://127.0.0.1:' + config.appPort + '/tasks', function (error) {
                 if (error) {
                     TODO.error('Can not open application in browser! Paste this url in address bar: ' + appURL);
                 }
@@ -80,6 +92,7 @@ const TODODB = require('./lib/tododb');
 
     } catch (err) {
         TODO.error(err);
+        exec('pause');
     }
 
 })();
