@@ -157,7 +157,8 @@ table {
     cursor: default;
 }
 
-.tasks-table tbody tr:hover {
+.tasks-table tbody tr:hover,
+.tasks-table > tr:hover {
     background-color: lightgray;
 }
 

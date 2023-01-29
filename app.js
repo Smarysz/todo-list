@@ -57,7 +57,8 @@ return;*/
             res.renderID('exit');
         });
 
-        app.post('/exit', function () {
+        app.post('/exit', async function () {
+            await TODODB.close();
             process.exit();
         });
 
@@ -65,6 +66,28 @@ return;*/
             const tid = req.params.id;
             const removed = await TODODB.removeTask(tid);
             if (removed) {
+                res.json({ status: true });
+            } else {
+                res.json({ status: false });
+            }
+            res.end();
+        });
+
+        app.post('/task/confirm/:tid', async function (req, res) {
+            const tid = req.params.tid;
+            const confirmed = await TODODB.confirmTask(tid);
+            if (confirmed) {
+                res.json({ status: true });
+            } else {
+                res.json({ status: false });
+            }
+            res.end();
+        });
+
+        app.post('/task/uncheck/:tid', async function (req, res) {
+            const tid = req.params.tid;
+            const unchecked = await TODODB.uncheckTask(tid);
+            if (unchecked) {
                 res.json({ status: true });
             } else {
                 res.json({ status: false });

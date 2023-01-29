@@ -19,7 +19,7 @@
                 else dtc++;
             });
         %> 
-        <h1 class="center mb-2">Undone tasks (<%= utc %>)</h1>
+        <h1 class="center mb-2">Undone tasks (<span id="undone-task-count"><%= utc %></span>)</h1>
         <%
             let undoneTasks = `<thead><tr>
                     <th>Task</th>
@@ -39,31 +39,31 @@
 
             for(let row of locals.data) {
                 if(!row.done) {
-                    undoneTasks += `<tr class="undone-task">
-                        <td>${row.title}</td>
-                        <td>${row.deadline}</td>
-                        <td><a class="priority-task">${row.priority_name}</a></td>
+                    undoneTasks += `<tr class="undone-task" data-title="${row.title}" data-deadline="${row.deadline}" data-priority="${row.priority_name}" data-tid="${row.ID}">
+                        <td class="undone-title">${row.title}</td>
+                        <td class="undone-deadline">${row.deadline}</td>
+                        <td class="undone-priority"><a class="priority-task">${row.priority_name}</a></td>
                         <td><a data-tid="${row.ID}" class="edit-task">Edit</a></td>
-                        <td><a data-tid="${row.ID}" class="confirm-task">Confirm</a></td>
+                        <td><a data-tid="${row.ID}" data-event="false" class="confirm-task">Confirm</a></td>
                         <td><a data-tid="${row.ID}" class="remove-task">Remove</a></td>
                     </tr>`;
                 } else {
-                    doneTasks += `<tr class="done-task">
-                        <td>${row.title}</td>
-                        <td>${row.deadline}</td>
-                        <td>${row.priority_name}</td>
-                        <td><a data-tid="${row.ID}" class="uncheck-task">Uncheck</a></td>
+                    doneTasks += `<tr class="done-task" data-title="${row.title}" data-deadline="${row.deadline}" data-priority="${row.priority_name}" data-tid="${row.ID}">
+                        <td class="done-title">${row.title}</td>
+                        <td class="done-deadline">${row.deadline}</td>
+                        <td class="done-priority"><a class="priority-task">${row.priority_name}</a></td>
+                        <td><a data-tid="${row.ID}" data-event="false" class="uncheck-task">Uncheck</a></td>
                         <td><a data-tid="${row.ID}" class="remove-task">Remove</a></td>
                     </tr>`;
                 }
             }
 
         %>
-        <table class="tasks-table" title="Double click to copy value">
+        <table class="tasks-table" id="undone-tasks-table" data-type="undone">
             <%- undoneTasks %>
         </table>
-        <h1 class="center mb-2">Done tasks (<%= dtc %>)</h1>
-        <table class="tasks-table" title="Double click to copy value">
+        <h1 class="center mb-2">Done tasks (<span id="done-task-count"><%= dtc %></span>)</h1>
+        <table class="tasks-table" id="done-tasks-table" data-type="done">
             <%- doneTasks %>
         </table>
     </div>
