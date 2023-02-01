@@ -4,15 +4,6 @@ const fs = require('fs');
 const TODO = require('./lib/todo');
 const TODODB = require('./lib/tododb');
 
-
-/*(async function() {
-
-    console.log(await TODODB.getAllTasks());
-
-})();
-
-return;*/
-
 (async function () {
 
     try {
@@ -62,8 +53,8 @@ return;*/
             process.exit();
         });
 
-        app.delete('/task/:id', async function (req, res) {
-            const tid = req.params.id;
+        app.delete('/task/:tid', async function (req, res) {
+            const tid = req.params.tid;
             const removed = await TODODB.removeTask(tid);
             if (removed) {
                 res.json({ status: true });

@@ -19,7 +19,8 @@
                 else dtc++;
             });
         %> 
-        <h1 class="center mb-2">Undone tasks (<span id="undone-task-count"><%= utc %></span>)</h1>
+        <h1 class="center mb-2 noselect">Undone tasks (<span id="undone-task-count"><%= utc %></span>)</h1>
+        <input type="text" id="undone-search" data-type="undone" placeholder="Search">
         <%
             let undoneTasks = `<thead><tr>
                     <th>Task</th>
@@ -37,36 +38,64 @@
                     <th>Remove</th>
             </tr></thead>`;
 
+            undoneTasks += '<tbody>';
+            doneTasks += '<tbody>';
+
             for(let row of locals.data) {
+                let priorityColor = '';
+                if(row.deadline && TODO.date(row.deadline) === TODO.date()) {
+                    priorityColor = 'priority-today';
+                }
+                if(!row.deadline) row.deadline = '-';
                 if(!row.done) {
                     undoneTasks += `<tr class="undone-task" data-title="${row.title}" data-deadline="${row.deadline}" data-priority="${row.priority_name}" data-tid="${row.ID}">
-                        <td class="undone-title">${row.title}</td>
-                        <td class="undone-deadline">${row.deadline}</td>
+                        <td class="undone-title"><a class="any-task" title="Click to show details">${row.title}</a></td>
+                        <td class="undone-deadline ${priorityColor}">${row.deadline}</td>
                         <td class="undone-priority"><a class="priority-task">${row.priority_name}</a></td>
                         <td><a data-tid="${row.ID}" class="edit-task">Edit</a></td>
                         <td><a data-tid="${row.ID}" data-event="false" class="confirm-task">Confirm</a></td>
-                        <td><a data-tid="${row.ID}" class="remove-task">Remove</a></td>
+                        <td><a data-tid="${row.ID}" data-event="false" class="remove-task">Remove</a></td>
                     </tr>`;
+
                 } else {
                     doneTasks += `<tr class="done-task" data-title="${row.title}" data-deadline="${row.deadline}" data-priority="${row.priority_name}" data-tid="${row.ID}">
-                        <td class="done-title">${row.title}</td>
+                        <td class="done-title"><a class="any-task" title="Click to show details">${row.title}</a></td>
                         <td class="done-deadline">${row.deadline}</td>
                         <td class="done-priority"><a class="priority-task">${row.priority_name}</a></td>
                         <td><a data-tid="${row.ID}" data-event="false" class="uncheck-task">Uncheck</a></td>
-                        <td><a data-tid="${row.ID}" class="remove-task">Remove</a></td>
+                        <td><a data-tid="${row.ID}" data-event="false" class="remove-task">Remove</a></td>
                     </tr>`;
                 }
             }
+
+            undoneTasks += '</tbody>';
+            doneTasks += '</tbody>';
 
         %>
         <table class="tasks-table" id="undone-tasks-table" data-type="undone">
             <%- undoneTasks %>
         </table>
-        <h1 class="center mb-2">Done tasks (<span id="done-task-count"><%= dtc %></span>)</h1>
+        <h1 class="center mb-2 noselect">Done tasks (<span id="done-task-count"><%= dtc %></span>)</h1>
+        <input type="text" id="undone-search" data-type="done" placeholder="Search">
         <table class="tasks-table" id="done-tasks-table" data-type="done">
             <%- doneTasks %>
         </table>
     </div>
+    <%- include('footer') %>
+    <div class="modal-layer">
+        <div class="modal-window">
+            <div class="modal-window-header">
+                <div class="modal-window-close">
+                    <img src="">
+                </div>
+            </div>
+            <div class="modal-window-content">
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestias atque et aliquid fuga laborum voluptatum nobis! Placeat tempora, velit dolores sit commodi sed est ullam ipsum sint, itaque, quae reiciendis fugit veritatis quos non eos iste nihil asperiores! Temporibus quos aliquid blanditiis odio enim nesciunt! Esse inventore ut qui ipsa nisi ullam sit sunt et non animi neque, rem totam labore accusantium numquam pariatur.</p>
+                <input type="button" class="btn1" value="OK">
+            </div>
+        </div>
+    </div>
+    <div class="hidden tasks-data"><%= JSON.stringify(locals.data) %></div>
     <script src="js/global.js"></script>
 </body>
 

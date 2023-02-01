@@ -1,6 +1,8 @@
 * {
     margin: 0;
     padding: 0;
+    cursor: default;
+    outline: none;
 }
 
 :root {
@@ -32,6 +34,8 @@ table {
     align-items: center;
     justify-content: flex-start;
     background-color: #6495ed;
+    position: fixed;
+    width: 100%;
 }
 
 .app-title {
@@ -137,7 +141,7 @@ table {
 }
 
 .main-container {
-    padding: 1rem;
+    padding: 5rem 1rem;
 }
 
 .author-title {
@@ -151,6 +155,7 @@ table {
 
 .tasks-table {
     margin: 2rem auto;
+    min-width: 512px;
 }
 
 .tasks-table thead tr {
@@ -158,7 +163,7 @@ table {
 }
 
 .tasks-table tbody tr:hover,
-.tasks-table > tr:hover {
+.tasks-table>tr:hover {
     background-color: lightgray;
 }
 
@@ -166,11 +171,25 @@ table {
     background-color: #6495ed;
 }
 
+.tasks-table th,
+.remove-task,
+.confirm-task,
+.edit-task,
+.uncheck-task {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 .tasks-table td,
 .tasks-table th {
-    border: 1px solid #000;
+    border: 1px solid rgba(0, 0, 0, 32%);
     text-align: center;
     padding: 0.5rem;
+    font-weight: 600;
 }
 
 .tasks-table th {
@@ -187,7 +206,7 @@ table {
 .confirm-task:hover,
 .edit-task:hover,
 .uncheck-task:hover,
-.priority-task:hover {
+.any-task:hover {
     text-decoration: underline;
     cursor: pointer;
 }
@@ -208,5 +227,66 @@ table {
 }
 
 .priority-task {
-    font-weight: 600;
+    font-weight: bold;
+}
+
+.priority-today {
+    color: red;
+    font-style: italic;
+    font-weight: bold;
+}
+
+.hidden {
+    display: none;
+}
+
+#undone-search,
+#done-search {
+    padding: 0.5rem;
+    cursor: text;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    width: 256px;
+    margin: 0 auto;
+    display: block;
+    border: 1px solid var(--black);
+}
+
+#undone-search:focus,
+#done-search:focus {
+    border: 1px solid #5083e2;
+}
+
+.search-noresults {
+    border: 1px solid red !important;
+}
+
+/* Modal window */
+
+.modal-layer {
+	width: 100%;
+	height: 100vh;
+	background-color: rgba(0, 0, 0, 64%);
+	position: absolute;
+	top: 0;
+    display: none;
+	/*display: grid;*/
+	justify-content: center;
+	align-content: center;
+}
+
+.modal-window {
+    width: 750px;
+    height: auto;
+    background-color: whitesmoke;
+}
+
+.modal-window-header {
+    width: 100%;
+    height: 32px;
+    background-color: #6495ed;
+}
+
+.modal-window-content {
+    padding: 2rem;
 }
