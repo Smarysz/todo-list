@@ -12,88 +12,122 @@
 <body class="id-<%= locals.pageID || 'none' %>" data-pageid="<%= locals.pageID %>">
     <%- include('header') %>
     <div class="main-container">
-        <%
-            let utc = dtc = 0;
-            locals.data.forEach(e => {
-                if(!e.done) utc++;
-                else dtc++;
-            });
-        %> 
-        <h1 class="center mb-2 noselect">Undone tasks (<span id="undone-task-count"><%= utc %></span>)</h1>
-        <input type="text" id="undone-search" data-type="undone" placeholder="Search">
-        <%
-            let undoneTasks = `<thead><tr>
-                    <th>Task</th>
-                    <th>Deadline</th>
-                    <th>Priority</th>
-                    <th>Edit</th>
-                    <th>Confirm</th>
-                    <th>Remove</th>
-                </tr></thead>`,
-            doneTasks = `<thead><tr>
-                    <th>Task</th>
-                    <th>Deadline</th>
-                    <th>Priority</th>
-                    <th>Uncheck</th>
-                    <th>Remove</th>
-            </tr></thead>`;
-
-            undoneTasks += '<tbody>';
-            doneTasks += '<tbody>';
-
-            for(let row of locals.data) {
-                let priorityColor = '';
-                if(row.deadline && TODO.date(row.deadline) === TODO.date()) {
-                    priorityColor = 'priority-today';
-                }
-                if(!row.deadline) row.deadline = '-';
-                if(!row.done) {
-                    undoneTasks += `<tr class="undone-task" data-title="${row.title}" data-deadline="${row.deadline}" data-priority="${row.priority_name}" data-tid="${row.ID}">
-                        <td class="undone-title"><a class="any-task" title="Click to show details">${row.title}</a></td>
-                        <td class="undone-deadline ${priorityColor}">${row.deadline}</td>
-                        <td class="undone-priority"><a class="priority-task">${row.priority_name}</a></td>
-                        <td><a data-tid="${row.ID}" class="edit-task">Edit</a></td>
-                        <td><a data-tid="${row.ID}" data-event="false" class="confirm-task">Confirm</a></td>
-                        <td><a data-tid="${row.ID}" data-event="false" class="remove-task">Remove</a></td>
-                    </tr>`;
-
-                } else {
-                    doneTasks += `<tr class="done-task" data-title="${row.title}" data-deadline="${row.deadline}" data-priority="${row.priority_name}" data-tid="${row.ID}">
-                        <td class="done-title"><a class="any-task" title="Click to show details">${row.title}</a></td>
-                        <td class="done-deadline">${row.deadline}</td>
-                        <td class="done-priority"><a class="priority-task">${row.priority_name}</a></td>
-                        <td><a data-tid="${row.ID}" data-event="false" class="uncheck-task">Uncheck</a></td>
-                        <td><a data-tid="${row.ID}" data-event="false" class="remove-task">Remove</a></td>
-                    </tr>`;
-                }
-            }
-
-            undoneTasks += '</tbody>';
-            doneTasks += '</tbody>';
-
-        %>
-        <table class="tasks-table" id="undone-tasks-table" data-type="undone">
-            <%- undoneTasks %>
-        </table>
-        <h1 class="center mb-2 noselect">Done tasks (<span id="done-task-count"><%= dtc %></span>)</h1>
-        <input type="text" id="undone-search" data-type="done" placeholder="Search">
-        <table class="tasks-table" id="done-tasks-table" data-type="done">
-            <%- doneTasks %>
-        </table>
+        <div id="tasks-controls">
+            <input type="button" id="new-task" class="btn1" value="New task">
+        </div>
+        <div id="tasks-container">
+            <div id="undone-container">
+                <%
+                let utc = dtc = 0;
+                locals.data.forEach(e => {
+                    if(!e.done) utc++;
+                    else dtc++;
+                });
+                %> 
+                <h1 class="center mb-2 noselect">Undone tasks (<span id="undone-task-count"><%= utc %></span>)</h1>
+                <input type="text" id="undone-search" class="input" data-type="undone" placeholder="Search tasks">
+                <%
+                    let undoneTasks = `<thead><tr>
+                            <th>Task</th>
+                            <th>Deadline</th>
+                            <th>Priority</th>
+                            <th>Edit</th>
+                            <th>Confirm</th>
+                            <th>Remove</th>
+                        </tr></thead>`,
+                    doneTasks = `<thead><tr>
+                            <th>Task</th>
+                            <th>Deadline</th>
+                            <th>Priority</th>
+                            <th>Uncheck</th>
+                            <th>Remove</th>
+                    </tr></thead>`;
+    
+                    undoneTasks += '<tbody>';
+                    doneTasks += '<tbody>';
+    
+                    for(let row of locals.data) {
+                        let priorityColor = '';
+                        if(row.deadline && TODO.date(row.deadline) === TODO.date()) {
+                            priorityColor = 'priority-today';
+                        }
+                        if(!row.deadline) row.deadline = '-';
+                        if(!row.done) {
+                            undoneTasks += `<tr class="undone-task" data-title="${row.title}" data-deadline="${row.deadline}" data-priority="${row.priority_name}" data-tid="${row.ID}">
+                                <td class="undone-title"><a class="any-task" title="Click to show details">${row.title}</a></td>
+                                <td class="undone-deadline ${priorityColor}">${row.deadline}</td>
+                                <td class="undone-priority"><a class="priority-task">${row.priority_name}</a></td>
+                                <td><a data-tid="${row.ID}" class="edit-task">Edit</a></td>
+                                <td><a data-tid="${row.ID}" data-event="false" class="confirm-task">Confirm</a></td>
+                                <td><a data-tid="${row.ID}" data-event="false" class="remove-task">Remove</a></td>
+                            </tr>`;
+    
+                        } else {
+                            doneTasks += `<tr class="done-task" data-title="${row.title}" data-deadline="${row.deadline}" data-priority="${row.priority_name}" data-tid="${row.ID}">
+                                <td class="done-title"><a class="any-task" title="Click to show details">${row.title}</a></td>
+                                <td class="done-deadline">${row.deadline}</td>
+                                <td class="done-priority"><a class="priority-task">${row.priority_name}</a></td>
+                                <td><a data-tid="${row.ID}" data-event="false" class="uncheck-task">Uncheck</a></td>
+                                <td><a data-tid="${row.ID}" data-event="false" class="remove-task">Remove</a></td>
+                            </tr>`;
+                        }
+                    }
+    
+                    undoneTasks += '</tbody>';
+                    doneTasks += '</tbody>';
+    
+                %>
+                <table class="tasks-table" id="undone-tasks-table" data-type="undone">
+                    <%- undoneTasks %>
+                </table>
+            </div>
+            <div id="done-container">
+                <h1 class="center mb-2 noselect">Done tasks (<span id="done-task-count"><%= dtc %></span>)</h1>
+                <input type="text" id="undone-search" class="input" data-type="done" placeholder="Search tasks">
+                <table class="tasks-table" id="done-tasks-table" data-type="done">
+                    <%- doneTasks %>
+                </table>
+            </div>
+        </div>
     </div>
     <%- include('footer') %>
-    <div class="modal-layer">
-        <div class="modal-window">
+    <div id="modal-layer">
+        <div class="modal-window" data-name="new-task">
             <div class="modal-window-header">
                 <div class="modal-window-close">
-                    <img src="">
+                    <img src="/img/exit-icon.png" class="modal-window-x" title="Close window" data-name="new-task">
+                </div>
+            </div>
+            <div class="modal-window-content">
+                <h1>Create new task</h1>
+                <input type="text" class="input" id="task-name" maxlength="255" placeholder="Task name">
+                <div id="task-deadline-container">
+                    <input type="date" class="input" id="task-deadline-date">
+                    <input type="time" class="input" id="task-deadline-time">
+                </div>
+                <select class="input" id="task-priority">
+                    <option value="0">Choose priority</option>
+                    <option value="1">Low</option>
+                    <option value="2">Medium</option>
+                    <option value="3">High</option>
+                </select>
+                <textarea class="input" id="task-description" maxlength="65535" placeholder="Details" spellcheck="false"></textarea>
+                <input type="button" class="btn1" id="create-task" value="Create">
+            </div>
+        </div>
+
+        <div class="modal-window" data-name="edit-task">
+            <div class="modal-window-header">
+                <div class="modal-window-close">
+                    <img src="/img/exit-icon.png" class="modal-window-x" title="Close window" data-name="edit-task">
                 </div>
             </div>
             <div class="modal-window-content">
                 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestias atque et aliquid fuga laborum voluptatum nobis! Placeat tempora, velit dolores sit commodi sed est ullam ipsum sint, itaque, quae reiciendis fugit veritatis quos non eos iste nihil asperiores! Temporibus quos aliquid blanditiis odio enim nesciunt! Esse inventore ut qui ipsa nisi ullam sit sunt et non animi neque, rem totam labore accusantium numquam pariatur.</p>
-                <input type="button" class="btn1" value="OK">
+                <input type="button" class="btn1" value="Save">
             </div>
         </div>
+
     </div>
     <div class="hidden tasks-data"><%= JSON.stringify(locals.data) %></div>
     <script src="js/global.js"></script>

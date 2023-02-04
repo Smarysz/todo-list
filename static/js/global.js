@@ -3,6 +3,9 @@ console.clear();
 ////////// Global frontend JavaScript file
 
 class TODO {
+
+    static isWindowOpened = false;
+
     /**
      * 
      * @param {string | Date | undefined} date Date or empty
@@ -82,6 +85,29 @@ class TODO {
         else d = new Date(date);
         return d.getFullYear();
     }
+
+    static openWindow(name) {
+        if (!this.isWindowOpened) {
+            const win = document.querySelector(`.modal-window[data-name=${name}]`);
+            if (win) {
+                document.querySelector('#modal-layer').style.display = 'grid';
+                win.style.display = 'block';
+            }
+            this.isWindowOpened = true;
+        }
+    }
+
+    static closeWindow(name) {
+        if (this.isWindowOpened) {
+            const win = document.querySelector(`.modal-window[data-name=${name}]`);
+            if (win) {
+                win.style.display = 'none';
+                document.querySelector('#modal-layer').style.display = 'none';
+            }
+            this.isWindowOpened = false;
+        }
+    }
+
 }
 
 class TODODB {
@@ -257,3 +283,113 @@ document.querySelectorAll('#undone-search, #done-search').forEach(e => {
 
     });
 });
+
+document.querySelectorAll('.modal-window-x').forEach(e => {
+    e.addEventListener('click', function () {
+        TODO.closeWindow(e.dataset.name);
+    });
+});
+
+const taskName = document.querySelector('#task-name');
+const deadlineDate = document.querySelector('#task-deadline-date');
+const deadlineTime = document.querySelector('#task-deadline-time');
+const taskPriority = document.querySelector('#task-priority');
+const taskDescription = document.querySelector('#task-description');
+
+const newTaskBtn = document.querySelector('#new-task');
+if (newTaskBtn) {
+    newTaskBtn.addEventListener('click', function () {
+        taskName.value = '';
+        taskName.title = '';
+        taskName.classList.remove('input-error');
+        deadlineDate.value = '';
+        deadlineDate.title = '';
+        deadlineDate.classList.remove('input-error');
+        deadlineTime.value = '';
+        deadlineTime.title = '';
+        deadlineTime.classList.remove('input-error');
+        taskPriority.value = 0;
+        taskPriority.title = '';
+        taskPriority.classList.remove('input-error');
+        taskDescription.value = '';
+        TODO.openWindow('new-task');
+    });
+}
+
+if (taskName) {
+    taskName.addEventListener('input', function () {
+        if (this.value.length) {
+            this.classList.remove('input-error');
+            this.title = '';
+        }
+    });
+}
+
+if (taskPriority) {
+    taskPriority.addEventListener('input', function () {
+        if (this.value != 0) {
+            this.classList.remove('input-error');
+            this.title = '';
+        }
+    });
+}
+
+if (deadlineDate) {
+    deadlineDate.addEventListener('input', function () {
+        if (this.value) {
+            this.classList.remove('input-error');
+            this.title = '';
+        }
+    });
+}
+
+if (taskDescription) {
+    taskDescription.addEventListener('input', function () {
+        if (this.value.length <= 65535) {
+            this.classList.remove('input-error');
+            this.title = '';
+        }
+        if (this.value.length > 65535) {
+            this.classList.add('input-error');
+            this.title = 'Maximum length is 65535';
+        }
+    });
+}
+
+const createTaskBtn = document.querySelector('#create-task');
+if (createTaskBtn) {
+    createTaskBtn.addEventListener('click', async function () {
+        let isValid = true;
+        const name = taskName.value;
+        const date = deadlineDate.value;
+        const time = deadlineTime.value;
+        const priority = taskPriority.value;
+        const description = taskDescription.value;
+
+        if (!name.length) {
+            taskName.classList.add('input-error');
+            taskName.title = 'Task name can not be empty';
+            isValid = false;
+        }
+
+        if (priority == 0) {
+            taskPriority.classList.add('input-error');
+            taskPriority.title = 'Priority can not be empty';
+            isValid = false;
+        }
+
+        if (!date && time) {
+            deadlineDate.classList.add('input-error');
+            deadlineDate.title = 'Date can not be empty if time is set';
+        }
+
+        if (description.length > 65535) {
+            taskDescription.classList.add('input-error');
+            taskDescription.title = 'Maximum length is 65535';
+        }
+
+        if (!isValid) return;
+
+        //TODO.closeWindow('new-task');
+    });
+}
