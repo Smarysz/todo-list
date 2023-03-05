@@ -12,20 +12,23 @@
 <body class="id-<%= locals.pageID || 'none' %>" data-pageid="<%= locals.pageID %>">
     <%- include('header') %>
     <div class="main-container">
-        <div id="tasks-controls">
-            <input type="button" id="new-task" class="btn1" value="New task">
-        </div>
+        
         <div id="tasks-container">
             <div id="undone-container">
                 <%
+
                 let utc = dtc = 0;
                 locals.data.forEach(e => {
                     if(!e.done) utc++;
                     else dtc++;
                 });
+
                 %> 
                 <h1 class="center mb-2 noselect">Undone tasks (<span id="undone-task-count"><%= utc %></span>)</h1>
-                <input type="text" id="undone-search" class="input" data-type="undone" placeholder="Search tasks">
+                <div class="tasks-controls">
+                    <input type="text" id="undone-search" class="input" data-type="undone" placeholder="Search tasks">
+                    <input type="button" id="new-task" class="btn1" value="New task">
+                </div>
                 <%
                     let undoneTasks = `<thead><tr>
                             <th>Task</th>
@@ -83,7 +86,9 @@
             </div>
             <div id="done-container">
                 <h1 class="center mb-2 noselect">Done tasks (<span id="done-task-count"><%= dtc %></span>)</h1>
-                <input type="text" id="undone-search" class="input" data-type="done" placeholder="Search tasks">
+                <div class="tasks-controls">
+                    <input type="text" id="undone-search" class="input" data-type="done" placeholder="Search tasks">
+                </div>
                 <table class="tasks-table" id="done-tasks-table" data-type="done">
                     <%- doneTasks %>
                 </table>
@@ -113,6 +118,57 @@
                 </select>
                 <textarea class="input" id="task-description" maxlength="65535" placeholder="Details" spellcheck="false"></textarea>
                 <input type="button" class="btn1" id="create-task" value="Create">
+            </div>
+        </div>
+
+        <div class="modal-window" data-name="show-details">
+            <div class="modal-window-header">
+                <div class="modal-window-close">
+                    <img src="/img/exit-icon.png" class="modal-window-x" title="Close window" data-name="show-details">
+                </div>
+            </div>
+            <div class="modal-window-content">
+                <h1 id="sd-task-title"></h1>
+                <pre id="sd-task-description"></pre>
+            </div>
+        </div>
+
+        <div class="modal-window" data-name="confirm-remove">
+            <div class="modal-window-header">
+                <div class="modal-window-close">
+                    <img src="/img/exit-icon.png" class="modal-window-x" title="Close window" data-name="confirm-remove">
+                </div>
+            </div>
+            <div class="modal-window-content">
+                <h1 class="noselect">Are you sure?</h1>
+                <div class="noselect">
+                    <input type="button" class="btn1" id="remove-task-yes" value="Yes">
+                    <input type="button" class="btn1" id="remove-task-no" value="No">
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-window" data-name="new-task-ok">
+            <div class="modal-window-header">
+                <div class="modal-window-close">
+                    <img src="/img/exit-icon.png" class="modal-window-x" title="Close window" data-name="new-task-ok">
+                </div>
+            </div>
+            <div class="modal-window-content">
+                <h1>Task has been added successfully!</h1>
+                <input type="button" class="btn1 ok-btn" data-name="new-task-ok" value="OK">
+            </div>
+        </div>
+
+        <div class="modal-window" data-name="new-task-error">
+            <div class="modal-window-header">
+                <div class="modal-window-close">
+                    <img src="/img/exit-icon.png" class="modal-window-x" title="Close window" data-name="new-task-error">
+                </div>
+            </div>
+            <div class="modal-window-content">
+                <h1>An unexpected error occured!</h1>
+                <input type="button" class="btn1 ok-btn" data-name="new-task-error" value="OK">
             </div>
         </div>
 

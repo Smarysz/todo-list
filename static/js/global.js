@@ -5,6 +5,7 @@ console.clear();
 class TODO {
 
     static isWindowOpened = false;
+    static openedWindow = null;
 
     /**
      * 
@@ -92,6 +93,7 @@ class TODO {
             if (win) {
                 document.querySelector('#modal-layer').style.display = 'grid';
                 win.style.display = 'block';
+                this.openedWindow = name;
             }
             this.isWindowOpened = true;
         }
@@ -103,6 +105,7 @@ class TODO {
             if (win) {
                 win.style.display = 'none';
                 document.querySelector('#modal-layer').style.display = 'none';
+                this.openedWindow = null;
             }
             this.isWindowOpened = false;
         }
@@ -139,6 +142,17 @@ class TODODB {
         return await data.json();
     }
 
+    static async addTask({ title, deadline, priority, description }) {
+        const data = await fetch('/task/add', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(arguments[0])
+        });
+        return await data.json();
+    }
+
 }
 
 const pageID = document.body.dataset.pageid;
@@ -152,17 +166,9 @@ if (document.body.classList.contains('id-exit')) {
 function removeTaskSetEvent() {
     document.querySelectorAll('.remove-task').forEach(function (e) {
         if (e.dataset.event === 'false') {
-            e.addEventListener('click', async function () {
-                const data = await TODODB.removeTask(e.dataset.tid);
-                if (data.status) {
-                    if (this.parentElement.parentElement.parentElement.parentElement.dataset.type === 'done') {
-                        document.querySelector('#done-task-count').textContent--;
-                    } else {
-                        document.querySelector('#undone-task-count').textContent--;
-                    }
-                    this.parentElement.parentElement.remove();
-                }
-
+            e.addEventListener('click', function () {
+                confirmRemoveYes.dataset.tid = e.dataset.tid;
+                TODO.openWindow('confirm-remove');
             });
             e.dataset.event = 'true';
         }
@@ -185,7 +191,7 @@ function confirmTaskSetEvent() {
                     tr.dataset.deadline = rootTR.dataset.deadline;
                     tr.dataset.priority = rootTR.dataset.priority;
                     tr.dataset.tid = rootTR.dataset.tid;
-                    tr.innerHTML = `<td><a class="any-task" title="Click to show details">${rootTR.dataset.title}</a></td>
+                    tr.innerHTML = `<td class="done-title"><a class="any-task" title="Click to show details">${rootTR.dataset.title}</a></td>
                         <td>${rootTR.dataset.deadline}</td>
                         <td><a class="priority-task">${rootTR.dataset.priority}</a></td>
                         <td><a data-tid="${rootTR.dataset.tid}" data-event="false" class="uncheck-task">Uncheck</a></td>
@@ -343,6 +349,13 @@ if (deadlineDate) {
     });
 }
 
+if (deadlineTime) {
+    deadlineTime.addEventListener('input', function () {
+        deadlineDate.classList.remove('input-error');
+        deadlineDate.title = '';
+    });
+}
+
 if (taskDescription) {
     taskDescription.addEventListener('input', function () {
         if (this.value.length <= 65535) {
@@ -381,15 +394,94 @@ if (createTaskBtn) {
         if (!date && time) {
             deadlineDate.classList.add('input-error');
             deadlineDate.title = 'Date can not be empty if time is set';
+            isValid = false;
         }
 
         if (description.length > 65535) {
             taskDescription.classList.add('input-error');
             taskDescription.title = 'Maximum length is 65535';
+            isValid = false;
+        }
+
+        let fullDate = date + ' ' + time;
+        fullDate = fullDate.trim();
+
+        const date1 = +(new Date(fullDate));
+        const date2 = +(new Date);
+
+        if (date2 - date1 >= 0) {
+            deadlineDate.classList.add('input-error');
+            deadlineDate.title = 'Date must be current';
+            isValid = false;
         }
 
         if (!isValid) return;
 
-        //TODO.closeWindow('new-task');
+        const added = await TODODB.addTask({
+            title: name,
+            deadline: fullDate,
+            priority,
+            description
+        });
+
+        if (added.status) {
+            TODO.closeWindow('new-task');
+            TODO.openWindow('new-task-ok');
+        } else {
+            TODO.openWindow('new-task-error');
+        }
+    });
+}
+
+document.querySelectorAll('.modal-window .ok-btn[data-name]').forEach(e => {
+    e.addEventListener('click', function () {
+        TODO.closeWindow(this.dataset.name);
+    });
+});
+
+const sdTaskTitle = document.querySelector('#sd-task-title');
+const sdTaskDescription = document.querySelector('#sd-task-description');
+
+document.querySelectorAll('.tasks-table').forEach(e => {
+    e.addEventListener('click', function (event) {
+        if (event.target.classList.contains('any-task')) {
+            const tid = event.target.parentElement.parentElement.dataset.tid;
+            const data = JSON.parse(document.querySelector('.tasks-data').textContent);
+            const task = data.find(e => e.ID === parseInt(tid));
+            sdTaskTitle.textContent = task.title;
+            sdTaskDescription.textContent = task.description;
+            TODO.openWindow('show-details');
+        }
+    });
+});
+
+const confirmRemoveYes = document.querySelector('#remove-task-yes');
+
+if (confirmRemoveYes) {
+    confirmRemoveYes.addEventListener('click', async function () {
+        const data = await TODODB.removeTask(confirmRemoveYes.dataset.tid);
+        if (data.status) {
+            if (this.parentElement.parentElement.parentElement.parentElement.dataset.type === 'done') {
+                document.querySelector('#done-task-count').textContent--;
+            } else {
+                document.querySelector('#undone-task-count').textContent--;
+            }
+            document.querySelector(`.tasks-table tr[data-tid='${confirmRemoveYes.dataset.tid}']`).remove();
+            TODO.closeWindow('confirm-remove');
+        }
+        confirmRemoveYes.dataset.tid = '';
+    });
+}
+
+const confirmRemoveNo = document.querySelector('#remove-task-no');
+
+if (confirmRemoveNo) {
+    confirmRemoveNo.addEventListener('click', function () {
+        confirmRemoveYes.dataset.tid = '';
+        TODO.closeWindow('confirm-remove');
+    });
+
+    document.querySelector('.modal-window[data-name=confirm-remove] .modal-window-x').addEventListener('click', function () {
+        confirmRemoveYes.dataset.tid = '';
     });
 }

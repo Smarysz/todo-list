@@ -1,6 +1,7 @@
 const express = require('express');
 const { exec } = require('child_process');
 const fs = require('fs');
+const bodyParser = require('body-parser');
 const TODO = require('./lib/todo');
 const TODODB = require('./lib/tododb');
 
@@ -23,6 +24,8 @@ const TODODB = require('./lib/tododb');
         app.set('views', './views');
 
         app.use(express.static('./static'));
+
+        app.use(bodyParser.json());
 
         // Own render function which render a view with model containing page ID
         app.response.renderID = function (view, model = {}) {
@@ -84,6 +87,15 @@ const TODODB = require('./lib/tododb');
                 res.json({ status: false });
             }
             res.end();
+        });
+
+        app.post('/task/add', async function (req, res) {
+            const added = await TODODB.addTask(req.body);
+            if (added) {
+                res.json({ status: true });
+            } else {
+                res.json({ status: false });
+            }
         });
 
         app.use(function (req, res) {

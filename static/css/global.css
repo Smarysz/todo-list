@@ -38,6 +38,12 @@ table {
 	width: 100%;
 }
 
+.undone-title,
+.done-title {
+	max-width: 300px;
+	overflow: hidden;
+}
+
 .app-title {
 	color: var(--black);
 	cursor: default;
@@ -156,6 +162,7 @@ table {
 .tasks-table {
 	margin: 2rem auto;
 	min-width: 512px;
+	max-width: 770px;
 }
 
 .tasks-table:has(> tbody:empty) {
@@ -179,7 +186,8 @@ table {
 .remove-task,
 .confirm-task,
 .edit-task,
-.uncheck-task {
+.uncheck-task,
+.priority-task {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
@@ -258,6 +266,7 @@ table {
 #done-search {
 	width: 256px;
 	transition: 0.3s border;
+	margin: 0 1rem;
 }
 
 #undone-search:focus,
@@ -275,7 +284,7 @@ table {
 	width: 100%;
 	height: 100vh;
 	background-color: rgba(0, 0, 0, 64%);
-	position: absolute;
+	position: fixed;
 	top: 0;
 	display: none;
 	justify-content: center;
@@ -348,11 +357,15 @@ table {
 #undone-container,
 #done-container {
 	width: 45%;
+	display: flex;
+	flex-flow: column;
 }
 
-#tasks-controls {
+.tasks-controls {
 	display: flex;
 	justify-content: center;
+	height: 45px;
+	margin-top: 1rem;
 }
 
 #task-name,
@@ -362,6 +375,11 @@ table {
 	width: 256px;
 	box-sizing: border-box;
 	transition: 0.3s border;
+}
+
+#new-task {
+	line-height: 0;
+	font-size: 1rem;
 }
 
 #task-deadline,
@@ -392,6 +410,7 @@ table {
 	width: 100%;
 	text-align: center;
 	margin-bottom: 2rem;
+	word-break: break-all;
 }
 
 .input-error {
@@ -418,4 +437,22 @@ table {
 
 #task-deadline-time {
 	width: 70px;
+}
+
+#sd-task-description {
+	background-color: #eee;
+	padding: 1rem 0 0 0;
+	overflow: scroll;
+	box-sizing: border-box;
+	width: 100%;
+	max-height: 400px;
+}
+
+#sd-task-description:empty {
+	display: none;
+}
+
+#remove-task-yes,
+#remove-task-no {
+	width: 80px;
 }
