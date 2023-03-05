@@ -128,8 +128,8 @@
                 </div>
             </div>
             <div class="modal-window-content">
-                <h1 id="sd-task-title"></h1>
-                <pre id="sd-task-description"></pre>
+                <h1 class="noselect" id="sd-task-title"></h1>
+                <pre class="noselect" id="sd-task-description"></pre>
             </div>
         </div>
 
@@ -155,7 +155,7 @@
                 </div>
             </div>
             <div class="modal-window-content">
-                <h1>Task has been added successfully!</h1>
+                <h1 class="noselect">Task has been added successfully!</h1>
                 <input type="button" class="btn1 ok-btn" data-name="new-task-ok" value="OK">
             </div>
         </div>
@@ -167,7 +167,7 @@
                 </div>
             </div>
             <div class="modal-window-content">
-                <h1>An unexpected error occured!</h1>
+                <h1 class="noselect">An unexpected error occured!</h1>
                 <input type="button" class="btn1 ok-btn" data-name="new-task-error" value="OK">
             </div>
         </div>
@@ -186,6 +186,8 @@
 
     </div>
     <div class="hidden tasks-data"><%= JSON.stringify(locals.data) %></div>
+    <script src="js/TODO.js"></script>
+    <script src="js/TODODB.js"></script>
     <script src="js/global.js"></script>
 </body>
 
