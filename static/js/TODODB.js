@@ -29,7 +29,7 @@ class TODODB {
 
     static async addTask({ title, deadline, priority, description }) {
         const data = await fetch('/task/add', {
-            method: "POST",
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -38,4 +38,14 @@ class TODODB {
         return await data.json();
     }
 
+    static async updateTask({ tid, title, deadline, priority, description }) {
+        const data = await fetch(`/task/${tid}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(arguments[0])
+        });
+        return await data.json();
+    }
 }

@@ -2,6 +2,12 @@ class TODO {
 
     static isWindowOpened = false;
     static openedWindow = null;
+    static priorities = {
+        1: 'Low',
+        2: 'Medium',
+        3: 'High'
+    };
+    static tasks = JSON.parse(document.querySelector('.tasks-data').textContent);
 
     /**
      * 
@@ -105,6 +111,70 @@ class TODO {
             }
             this.isWindowOpened = false;
         }
+    }
+
+    /**
+     * Adds task to undone tasks table
+     * @param {object} properties Task details
+     * @returns {boolean}
+     */
+    static addTaskToTable({ title, deadline, priority, tid, content }) {
+        if (!tid || !title || !priority) return false;
+
+        deadline = deadline || '-';
+
+        priority = parseInt(priority);
+        switch (priority) {
+            case 1: priority = 'Low'; break;
+            case 2: priority = 'Medium'; break;
+            case 3: priority = 'High'; break;
+            default: priority = 'Low';
+        }
+
+        const tr = document.createElement('tr');
+        tr.classList.add('undone-task');
+        tr.dataset.title = title;
+        tr.dataset.deadline = deadline;
+        tr.dataset.priority = priority;
+        tr.dataset.tid = tid;
+
+        let priorityColor = '';
+        if (deadline && TODO.date(deadline) === TODO.date()) priorityColor = 'priority-today';
+
+        tr.innerHTML = `<td class="undone-title"><a class="any-task" title="Click to show details">${title}</a></td>
+        <td class="undone-deadline ${priorityColor}">${deadline}</td>
+        <td class="undone-priority"><a class="priority-task">${priority}</a></td>
+        <td><a data-tid="${tid}" class="edit-task">Edit</a></td>
+        <td><a data-tid="${tid}" data-event="false" class="confirm-task">Confirm</a></td>
+        <td><a data-tid="${tid}" data-event="false" class="remove-task">Remove</a></td>`;
+        document.querySelector('#undone-tasks-table tbody').appendChild(tr);
+        confirmTaskSetEvent();
+        removeTaskSetEvent();
+        document.querySelector('#undone-task-count').textContent++;
+        this.tasks.push({ ID: tid, title, deadline, done: 0, priority_id: priority, description: content, priority_name: "Medium" });
+        return true;
+    }
+
+    static updateTaskInTable({ title, deadline, priority, tid, content }) {
+        if (!tid || !title || !priority) {
+            console.error('Task ID, title and priority number can not be empty');
+            return false;
+        }
+        deadline = deadline || '-';
+        const tr = document.querySelector(`#undone-tasks-table [data-tid='${tid}']`);
+        tr.dataset.title = title;
+        tr.dataset.deadline = deadline;
+        tr.dataset.priority = this.priorities[priority];
+        tr.dataset.tid = tid;
+        tr.querySelector('.undone-title .any-task').textContent = title;
+        tr.querySelector('.undone-deadline').textContent = deadline;
+        tr.querySelector('.priority-task').textContent = this.priorities[priority];
+        const task = TODO.tasks.find(e => e.ID === parseInt(tid));
+        task.title = title;
+        task.deadline = deadline;
+        task.priority_id = parseInt(priority);
+        task.priority_name = this.priorities[priority];
+        task.description = content;
     }
 
 }

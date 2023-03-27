@@ -1,9 +1,13 @@
 console.clear();
 
-////////// Global frontend JavaScript file
+////////// Global frontend JavaScript file //////////
 
 const pageID = document.body.dataset.pageid;
 const activeItem = document.querySelector(`.menu-item[data-page='${pageID}']`);
+
+const doneTaskTable = document.querySelector('#done-tasks-table');
+const undoneTaskTable = document.querySelector('#undone-tasks-table');
+
 if (activeItem) activeItem.classList.add('menu-item-active');
 
 if (document.body.classList.contains('id-exit')) {
@@ -264,16 +268,12 @@ if (createTaskBtn) {
 
         if (!isValid) return;
 
-        const added = await TODODB.addTask({
-            title: name,
-            deadline: fullDate,
-            priority,
-            description
-        });
+        const added = await TODODB.addTask({ title: name, deadline: fullDate, priority, description });
 
         if (added.status) {
             TODO.closeWindow('new-task');
             TODO.openWindow('new-task-ok');
+            TODO.addTaskToTable({ title: name, deadline: fullDate, priority, tid: added.tid, content: description });
         } else {
             TODO.openWindow('new-task-error');
         }
@@ -293,8 +293,7 @@ document.querySelectorAll('.tasks-table').forEach(e => {
     e.addEventListener('click', function (event) {
         if (event.target.classList.contains('any-task')) {
             const tid = event.target.parentElement.parentElement.dataset.tid;
-            const data = JSON.parse(document.querySelector('.tasks-data').textContent);
-            const task = data.find(e => e.ID === parseInt(tid));
+            const task = TODO.tasks.find(e => e.ID === parseInt(tid));
             sdTaskTitle.textContent = task.title;
             sdTaskDescription.textContent = task.description;
             TODO.openWindow('show-details');
@@ -304,11 +303,172 @@ document.querySelectorAll('.tasks-table').forEach(e => {
 
 const confirmRemoveYes = document.querySelector('#remove-task-yes');
 
+if (doneTaskTable) {
+    doneTaskTable.addEventListener('click', function (e) {
+        if (e.target.classList.contains('remove-task')) {
+            confirmRemoveYes.dataset.type = 'done';
+        }
+    });
+}
+
+if (undoneTaskTable) {
+    undoneTaskTable.addEventListener('click', function (e) {
+        if (e.target.classList.contains('edit-task')) {
+            editTaskSave.dataset.tid = e.target.dataset.tid;
+            const task = TODO.tasks.find(el => el.ID == e.target.dataset.tid);
+            if (task) {
+                editTaskName.value = task.title;
+                if (task.deadline.toUpperCase() !== 'NULL') {
+                    const deadline = task.deadline.split(' ');
+                    editTaskDeadlineDate.value = deadline[0] || '';
+                    editTaskDeadlineTime.value = deadline[1] || '';
+                }
+                editTaskPriority.value = task.priority_id;
+                editTaskDescription.value = task.description;
+                TODO.openWindow('edit-task');
+            }
+        }
+    });
+}
+
+const editTaskSave = document.querySelector('#edit-task-save');
+const editTaskX = document.querySelector('.modal-window[data-name=edit-task] .modal-window-x');
+const editTaskName = document.querySelector('#edit-task-name');
+const editTaskDeadlineDate = document.querySelector('#edit-task-deadline-date');
+const editTaskDeadlineTime = document.querySelector('#edit-task-deadline-time');
+const editTaskPriority = document.querySelector('#edit-task-priority');
+const editTaskDescription = document.querySelector('#edit-task-description');
+
+if (editTaskX) {
+
+    function clearInputs() {
+        editTaskName.value = '';
+        editTaskDeadlineDate.value = '';
+        editTaskDeadlineTime.value = '';
+        editTaskPriority.value = 0;
+        editTaskDescription.value = '';
+    }
+
+    clearInputs();
+
+    editTaskName.addEventListener('input', function () {
+        if (this.value.length) {
+            this.classList.remove('input-error');
+            this.title = '';
+        }
+    });
+
+    editTaskDeadlineTime.addEventListener('input', function () {
+        editTaskDeadlineDate.classList.remove('input-error');
+        editTaskDeadlineDate.title = '';
+    });
+
+    editTaskDeadlineDate.addEventListener('input', function () {
+        if (this.value) {
+            this.classList.remove('input-error');
+            this.title = '';
+        }
+    });
+
+    editTaskPriority.addEventListener('input', function () {
+        if (this.value != 0) {
+            this.classList.remove('input-error');
+            this.title = '';
+        }
+    });
+
+    editTaskDescription.addEventListener('input', function () {
+        if (this.value.length > 65535) {
+            this.classList.add('input-error');
+            this.title = 'Maximum length is 65535';
+        }
+        if (this.value.length <= 65535) {
+            this.classList.remove('input-error');
+            this.title = '';
+        }
+    });
+
+    editTaskSave.addEventListener('click', async function () {
+        document.querySelectorAll('.modal-window[data-name=edit-task] .input').forEach(e => {
+            e.classList.remove('input-error');
+            e.title = '';
+        });
+
+        let isValid = true;
+        const name = editTaskName.value;
+        const date = editTaskDeadlineDate.value;
+        const time = editTaskDeadlineTime.value;
+        const priority = editTaskPriority.value;
+        const description = editTaskDescription.value;
+
+        if (!name.length) {
+            editTaskName.classList.add('input-error');
+            editTaskName.title = 'Task name can not be empty';
+            isValid = false;
+        }
+
+        if (priority == 0) {
+            editTaskPriority.classList.add('input-error');
+            editTaskPriority.title = 'Priority can not be empty';
+            isValid = false;
+        }
+
+        if (!date && time) {
+            editTaskDeadlineDate.classList.add('input-error');
+            editTaskDeadlineDate.title = 'Date can not be empty if time is set';
+            isValid = false;
+        }
+
+        if (description.length > 65535) {
+            editTaskDescription.classList.add('input-error');
+            editTaskDescription.title = 'Maximum length is 65535';
+            isValid = false;
+        }
+
+        let fullDate = date + ' ' + time;
+        fullDate = fullDate.trim();
+
+        const date1 = +(new Date(fullDate));
+        const date2 = +(new Date);
+
+        if (date2 - date1 >= 0) {
+            editTaskDeadlineDate.classList.add('input-error');
+            editTaskDeadlineDate.title = 'Date must be current';
+            isValid = false;
+        }
+
+        let tid = String(parseInt(this.dataset.tid));
+
+        if (!isValid || tid == 'NaN') return;
+
+        tid = parseInt(tid);
+        const updated = await TODODB.updateTask({ tid, title: name, deadline: fullDate, priority, description });
+
+        TODO.closeWindow('edit-task');
+
+        if (updated.status) {
+            TODO.openWindow('edit-task-ok');
+            TODO.updateTaskInTable({ title: name, deadline: fullDate, priority, tid, content: description });
+        } else {
+            TODO.openWindow('edit-task-error');
+        }
+
+    });
+
+    editTaskX.addEventListener('click', function () {
+        document.querySelectorAll('.modal-window[data-name=edit-task] .input').forEach(e => {
+            e.classList.remove('input-error');
+            e.title = '';
+        });
+        clearInputs();
+    });
+}
+
 if (confirmRemoveYes) {
     confirmRemoveYes.addEventListener('click', async function () {
         const data = await TODODB.removeTask(confirmRemoveYes.dataset.tid);
         if (data.status) {
-            if (this.parentElement.parentElement.parentElement.parentElement.dataset.type === 'done') {
+            if (confirmRemoveYes.dataset.type === 'done') {
                 document.querySelector('#done-task-count').textContent--;
             } else {
                 document.querySelector('#undone-task-count').textContent--;

@@ -91,7 +91,16 @@ const TODODB = require('./lib/tododb');
 
         app.post('/task/add', async function (req, res) {
             const added = await TODODB.addTask(req.body);
-            if (added) {
+            if (added.changes === 1) {
+                res.json({ status: true, tid: added.lastInsertRowid });
+            } else {
+                res.json({ status: false });
+            }
+        });
+
+        app.put('/task/:tid', async function (req, res) {
+            const updated = await TODODB.updateTask(req.body);
+            if (updated.changes === 1) {
                 res.json({ status: true });
             } else {
                 res.json({ status: false });

@@ -12,6 +12,7 @@
 
 body {
 	background-color: whitesmoke;
+	overflow-y: scroll;
 }
 
 table {
@@ -391,7 +392,8 @@ table {
 	background-color: #fff;
 }
 
-#task-description {
+#task-description,
+#edit-task-description {
 	width: 512px;
 	min-height: 128px;
 	max-height: 457px;
@@ -431,8 +433,10 @@ table {
 	box-sizing: border-box;
 }
 
-#task-deadline-date {
+#task-deadline-date,
+#edit-task-deadline-date {
 	width: 170px;
+	box-sizing: border-box;
 }
 
 #task-deadline-time {
@@ -441,7 +445,7 @@ table {
 
 #sd-task-description {
 	background-color: #eee;
-	padding: 1rem 0 0 0;
+	padding: 1rem 0 0 1rem;
 	overflow: scroll;
 	box-sizing: border-box;
 	width: 100%;
@@ -455,4 +459,33 @@ table {
 #remove-task-yes,
 #remove-task-no {
 	width: 80px;
+}
+
+#edit-task-tname {
+	font-style: italic;
+	width: 256px;
+}
+
+#edit-task-name,
+#edit-task-deadline-container,
+#edit-task-priority {
+	width: 256px;
+	box-sizing: border-box;
+}
+
+#edit-task-priority {
+	margin-bottom: 1rem;
+	background-color: #fff;
+	cursor: default;
+}
+
+#edit-task-deadline-container {
+	margin: 1rem auto;
+	display: flex;
+	flex-flow: row;
+	justify-content: space-between;
+}
+
+#edit-task-deadline-container .input {
+	margin: 0;
 }
