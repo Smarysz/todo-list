@@ -14,7 +14,7 @@ if (document.body.classList.contains('id-exit')) {
     TODODB.shutdown();
 }
 
-function removeTaskSetEvent() {
+function deleteTaskSetEvent() {
     document.querySelectorAll('.remove-task').forEach(function (e) {
         if (e.dataset.event === 'false') {
             e.addEventListener('click', function () {
@@ -26,8 +26,8 @@ function removeTaskSetEvent() {
     });
 }
 
-// first call of removeTaskSetEvent()
-removeTaskSetEvent();
+// first call of deleteTaskSetEvent()
+deleteTaskSetEvent();
 
 function confirmTaskSetEvent() {
     document.querySelectorAll('.confirm-task').forEach(function (e) {
@@ -50,7 +50,7 @@ function confirmTaskSetEvent() {
                     document.querySelector('#done-tasks-table tbody').appendChild(tr);
                     rootTR.remove();
                     uncheckTaskSetEvent();
-                    removeTaskSetEvent();
+                    deleteTaskSetEvent();
                     document.querySelector('#done-task-count').textContent++;
                     document.querySelector('#undone-task-count').textContent--;
                 }
@@ -91,7 +91,7 @@ function uncheckTaskSetEvent() {
                     document.querySelector('#undone-tasks-table tbody').appendChild(tr);
                     rootTR.remove();
                     confirmTaskSetEvent();
-                    removeTaskSetEvent();
+                    deleteTaskSetEvent();
                     document.querySelector('#done-task-count').textContent--;
                     document.querySelector('#undone-task-count').textContent++;
                 }
@@ -466,7 +466,7 @@ if (editTaskX) {
 
 if (confirmRemoveYes) {
     confirmRemoveYes.addEventListener('click', async function () {
-        const data = await TODODB.removeTask(confirmRemoveYes.dataset.tid);
+        const data = await TODODB.deleteTask(confirmRemoveYes.dataset.tid);
         if (data.status) {
             if (confirmRemoveYes.dataset.type === 'done') {
                 document.querySelector('#done-task-count').textContent--;
@@ -492,3 +492,160 @@ if (confirmRemoveNo) {
         confirmRemoveYes.dataset.tid = '';
     });
 }
+
+const notesContainer = document.querySelector('#note-container-items');
+const newNoteBtn = document.querySelector('#new-note');
+const createNoteBtn = document.querySelector('#create-note');
+const noteName = document.querySelector('#note-name');
+const noteDescription = document.querySelector('#note-description');
+const removeNoteYes = document.querySelector('#remove-note-yes');
+const removeNoteNo = document.querySelector('#remove-note-no');
+const editNoteName = document.querySelector('#edit-note-name');
+const editNoteDescription = document.querySelector('#edit-note-description');
+const editNoteSave = document.querySelector('#edit-note-save');
+const sdNoteTitle = document.querySelector('#sd-note-title');
+const sdNoteDescription = document.querySelector('#sd-note-description');
+
+if (newNoteBtn) {
+
+    editNoteSave.addEventListener('click', async function () {
+        const name = editNoteName.value;
+        const content = editNoteDescription.value;
+        const nid = parseInt(this.dataset.nid);
+        let isValid = true;
+        if (!name) {
+            editNoteName.classList.add('input-error');
+            editNoteName.title = 'Note name can not be empty';
+            isValid = false;
+        }
+        if (content.length > 65535) {
+            editNoteDescription.classList.add('input-error');
+            editNoteDescription.title = 'Maximum length is 65535';
+            isValid = false;
+        }
+
+        if (!isValid) return;
+
+        const updated = await TODODB.updateNote({ nid, title: name, content });
+
+        if (updated.status) {
+            const note = TODO.notes.find(note => note.ID == nid);
+            note.title = name;
+            note.content = content;
+            document.querySelector(`.note-banner-title[data-nid="${nid}"]`).textContent = name;
+            TODO.closeWindow('edit-note');
+        }
+    });
+
+    editNoteDescription.addEventListener('input', function () {
+        if (this.value.length <= 65535) {
+            this.classList.remove('input-error');
+            this.title = '';
+        }
+    });
+
+    editNoteName.addEventListener('input', function () {
+        if (this.value.length) {
+            this.classList.remove('input-error');
+            this.title = '';
+        }
+    });
+
+    notesContainer.addEventListener('click', function (e) {
+        if (!e.target.classList.contains('edit-controls-container') && !e.target.classList.contains('edit-note-x') && !e.target.classList.contains('delete-note-x')) {
+            const nid = parseInt(e.target.dataset.nid);
+            if(!nid) return;
+            const note = TODO.notes.find(note => note.ID == nid);
+            sdNoteTitle.textContent = note.title;
+            sdNoteDescription.textContent = note.content;
+            TODO.openWindow('show-note-details');
+        }
+        if (e.target.classList.contains('delete-note-x')) {
+            removeNoteYes.dataset.nid = e.target.dataset.nid;
+            TODO.openWindow('note-confirm-remove');
+        }
+        if (e.target.classList.contains('edit-note-x')) {
+            const note = TODO.notes.find(note => note.ID == parseInt(e.target.dataset.nid));
+            editNoteName.value = note.title;
+            editNoteDescription.value = note.content;
+            editNoteSave.dataset.nid = note.ID;
+            TODO.openWindow('edit-note');
+        }
+    });
+
+    removeNoteYes.addEventListener('click', async function () {
+        const deleted = await TODODB.deleteNote(this.dataset.nid);
+        if (deleted.status) {
+            document.querySelector(`.note-element[data-nid='${this.dataset.nid}']`).remove();
+            TODO.closeWindow('note-confirm-remove');
+        }
+    });
+
+    removeNoteNo.addEventListener('click', function () {
+        removeNoteYes.dataset.nid = null;
+        TODO.closeWindow('note-confirm-remove');
+    });
+
+    newNoteBtn.addEventListener('click', function () {
+        noteName.value = '';
+        noteDescription.value = '';
+        TODO.openWindow('new-note');
+    });
+
+    noteName.addEventListener('input', function () {
+        if (this.value) {
+            this.classList.remove('input-error');
+            this.title = '';
+        }
+    });
+
+    noteDescription.addEventListener('input', function () {
+        if (this.value.length <= 65535) {
+            this.classList.remove('input-error');
+            this.title = '';
+        }
+    });
+
+    createNoteBtn.addEventListener('click', async function () {
+        let isValid = true;
+        const name = noteName.value;
+        const description = noteDescription.value;
+
+        if (!name.length) {
+            noteName.classList.add('input-error');
+            noteName.title = 'Note name can not be empty';
+            isValid = false;
+        }
+
+        if (description.length > 65535) {
+            noteDescription.classList.add('input-error');
+            noteDescription.title = 'Maximum length is 65535';
+            isValid = false;
+        }
+
+        if (!isValid) return;
+
+        const added = await TODODB.addNote({ name, description });
+
+        if (added.status) {
+            TODO.notes.push({ ID: added.nid, title: name, content: description });
+            notesContainer.innerHTML += `
+            <div class="note-element" data-nid="${added.nid}">
+                <h1 class="note-banner noselect">
+                    <div class="note-banner-title">${name}</div>
+                    <div class="edit-controls-container">
+                        <img src="/img/edit-icon.png" data-nid="${added.nid}" class="edit-note-x noselect" alt="Edit note" title="Edit" draggable="false">
+                        <img src="/img/exit-icon.png" data-nid="${added.nid}" class="delete-note-x noselect" alt="Delete note" title="Remove" draggable="false">
+                    </div>
+                </h1>
+                <pre class="note-content">${description}</pre>
+            </div>`;
+            TODO.closeWindow('new-note');
+            TODO.openWindow('new-note-ok');
+        }
+
+    });
+
+}
+
+document.querySelectorAll('.modal-window-x').forEach(e => e.setAttribute('draggable', 'false'));

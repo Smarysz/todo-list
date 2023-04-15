@@ -18,7 +18,7 @@
                 <%
 
                 let utc = dtc = 0;
-                locals.data.forEach(e => {
+                locals.tasksData.forEach(e => {
                     if(!e.done) utc++;
                     else dtc++;
                 });
@@ -49,14 +49,11 @@
                     undoneTasks += '<tbody>';
                     doneTasks += '<tbody>';
     
-                    for(let row of locals.data) {
+                    for(let row of locals.tasksData) {
                         let priorityColor = '';
                         if(row.deadline && TODO.date(row.deadline) === TODO.date()) {
                             priorityColor = 'priority-today';
                         }
-                        TODO.info('1 ' + row.ID + ' ' + TODO.date(row.deadline) === TODO.date());
-                        TODO.info('2 ' + TODO.date(row.deadline));
-                        TODO.info('3 '+TODO.date());
                         if(!row.deadline || row.deadline == 'NULL') row.deadline = '-';
                         if(!row.done) {
                             undoneTasks += `<tr class="undone-task" data-title="${row.title}" data-deadline="${row.deadline}" data-priority="${row.priority_name}" data-tid="${row.ID}">
@@ -145,8 +142,8 @@
             <div class="modal-window-content">
                 <h1 class="noselect">Are you sure?</h1>
                 <div class="noselect">
-                    <input type="button" class="btn1" id="remove-task-yes" value="Yes">
-                    <input type="button" class="btn1" id="remove-task-no" value="No">
+                    <input type="button" class="btn1 bool-btn" id="remove-task-yes" value="Yes">
+                    <input type="button" class="btn1 bool-btn" id="remove-task-no" value="No">
                 </div>
             </div>
         </div>
@@ -224,7 +221,7 @@
         </div>
 
     </div>
-    <div class="hidden tasks-data"><%= JSON.stringify(locals.data) %></div>
+    <div class="hidden tasks-data"><%= JSON.stringify(locals.tasksData) %></div>
     <script src="js/TODO.js"></script>
     <script src="js/TODODB.js"></script>
     <script src="js/global.js"></script>

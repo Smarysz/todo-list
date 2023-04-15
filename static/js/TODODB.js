@@ -6,7 +6,7 @@ class TODODB {
         });
     }
 
-    static async removeTask(tid) {
+    static async deleteTask(tid) {
         const data = await fetch(`/task/${tid}`, {
             method: 'DELETE'
         });
@@ -15,20 +15,20 @@ class TODODB {
 
     static async confirmTask(tid) {
         const data = await fetch(`/task/confirm/${tid}`, {
-            method: 'POST'
+            method: 'PUT'
         });
         return await data.json();
     }
 
     static async uncheckTask(tid) {
         const data = await fetch(`/task/uncheck/${tid}`, {
-            method: 'POST'
+            method: 'PUT'
         });
         return await data.json();
     }
 
     static async addTask({ title, deadline, priority, description }) {
-        const data = await fetch('/task/add', {
+        const data = await fetch('/task', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -48,4 +48,34 @@ class TODODB {
         });
         return await data.json();
     }
+
+    static async addNote({ name, description }) {
+        const data = await fetch(`/note`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(arguments[0])
+        });
+        return await data.json();
+    }
+
+    static async deleteNote(nid) {
+        const data = await fetch(`/note/${nid}`, {
+            method: 'DELETE'
+        });
+        return await data.json();
+    }
+
+    static async updateNote({ nid, title, content }) {
+        const data = await fetch(`/note/${nid}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(arguments[0])
+        });
+        return await data.json();
+    }
+
 }

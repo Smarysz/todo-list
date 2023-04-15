@@ -39,12 +39,13 @@ const TODODB = require('./lib/tododb');
         });
 
         app.get('/tasks', async function (req, res) {
-            const data = await TODODB.getAllTasks();
-            res.renderID('tasks', { data, TODO });
+            const tasksData = await TODODB.getAllTasks();
+            res.renderID('tasks', { tasksData, TODO });
         });
 
-        app.get('/notes', function (req, res) {
-            res.renderID('notes');
+        app.get('/notes', async function (req, res) {
+            const notesData = await TODODB.getAllNotes();
+            res.renderID('notes', { notesData });
         });
 
         app.get('/exit', function (req, res) {
@@ -58,7 +59,7 @@ const TODODB = require('./lib/tododb');
 
         app.delete('/task/:tid', async function (req, res) {
             const tid = req.params.tid;
-            const removed = await TODODB.removeTask(tid);
+            const removed = await TODODB.deleteTask(tid);
             if (removed) {
                 res.json({ status: true });
             } else {
@@ -67,7 +68,7 @@ const TODODB = require('./lib/tododb');
             res.end();
         });
 
-        app.post('/task/confirm/:tid', async function (req, res) {
+        app.put('/task/confirm/:tid', async function (req, res) {
             const tid = req.params.tid;
             const confirmed = await TODODB.confirmTask(tid);
             if (confirmed) {
@@ -78,7 +79,7 @@ const TODODB = require('./lib/tododb');
             res.end();
         });
 
-        app.post('/task/uncheck/:tid', async function (req, res) {
+        app.put('/task/uncheck/:tid', async function (req, res) {
             const tid = req.params.tid;
             const unchecked = await TODODB.uncheckTask(tid);
             if (unchecked) {
@@ -89,7 +90,7 @@ const TODODB = require('./lib/tododb');
             res.end();
         });
 
-        app.post('/task/add', async function (req, res) {
+        app.post('/task', async function (req, res) {
             const added = await TODODB.addTask(req.body);
             if (added.changes === 1) {
                 res.json({ status: true, tid: added.lastInsertRowid });
@@ -100,6 +101,35 @@ const TODODB = require('./lib/tododb');
 
         app.put('/task/:tid', async function (req, res) {
             const updated = await TODODB.updateTask(req.body);
+            if (updated.changes === 1) {
+                res.json({ status: true });
+            } else {
+                res.json({ status: false });
+            }
+        });
+
+        app.post('/note', async function (req, res) {
+            const added = await TODODB.addNote(req.body);
+            if (added.changes === 1) {
+                res.json({ status: true, nid: added.lastInsertRowid });
+            } else {
+                res.json({ status: false });
+            }
+        });
+
+        app.delete('/note/:nid', async function (req, res) {
+            const nid = req.params.nid;
+            const removed = await TODODB.deleteNote(nid);
+            if (removed) {
+                res.json({ status: true });
+            } else {
+                res.json({ status: false });
+            }
+            res.end();
+        });
+
+        app.put('/note/:nid', async function (req, res) {
+            const updated = await TODODB.updateNote(req.body);
             if (updated.changes === 1) {
                 res.json({ status: true });
             } else {

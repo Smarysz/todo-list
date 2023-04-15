@@ -7,7 +7,7 @@ class TODO {
         2: 'Medium',
         3: 'High'
     };
-    static tasks = JSON.parse(document.querySelector('.tasks-data').textContent);
+    static tasks = null;
 
     /**
      * 
@@ -90,6 +90,9 @@ class TODO {
     }
 
     static openWindow(name) {
+        if (!name) {
+            return console.error('Window name cannot be empty');
+        }
         if (!this.isWindowOpened) {
             const win = document.querySelector(`.modal-window[data-name=${name}]`);
             if (win) {
@@ -102,6 +105,9 @@ class TODO {
     }
 
     static closeWindow(name) {
+        if (!name) {
+            return console.error('Window name cannot be empty');
+        }
         if (this.isWindowOpened) {
             const win = document.querySelector(`.modal-window[data-name=${name}]`);
             if (win) {
@@ -149,7 +155,7 @@ class TODO {
         <td><a data-tid="${tid}" data-event="false" class="remove-task">Remove</a></td>`;
         document.querySelector('#undone-tasks-table tbody').appendChild(tr);
         confirmTaskSetEvent();
-        removeTaskSetEvent();
+        deleteTaskSetEvent();
         document.querySelector('#undone-task-count').textContent++;
         this.tasks.push({ ID: tid, title, deadline, done: 0, priority_id: priority, description: content, priority_name: "Medium" });
         return true;
@@ -177,4 +183,12 @@ class TODO {
         task.description = content;
     }
 
+}
+
+if (document.querySelector('.tasks-data')) {
+    TODO.tasks = JSON.parse(document.querySelector('.tasks-data').textContent);
+}
+
+if (document.querySelector('.notes-data')) {
+    TODO.notes = JSON.parse(document.querySelector('.notes-data').textContent);
 }
