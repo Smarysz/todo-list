@@ -12,7 +12,7 @@
     "url": "git+https://github.com/Smarysz/todo-list.git"
   },
   "keywords": [
-    "todo"
+    "todo", "todolist", "tdl", "smarysz"
   ],
   "author": "Smarysz",
   "license": "GPL-3.0-or-later",
